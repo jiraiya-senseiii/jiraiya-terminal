@@ -208,7 +208,7 @@ async function fetchPrices() {
     const resp = await fetch(`https://api.jup.ag/price/v3?ids=${ids}`);
     const data = await resp.json();
     const container = document.getElementById('ticker');
-    container.innerHTML = SOL_TOKENS.filter(t => data[t.mint]).map(t => {
+    container.innerHTML = SOL_TOKENS.filter(t => data[t.mint] && data[t.mint].usdPrice != null).map(t => {
       const d = data[t.mint];
       const price = d.usdPrice;
       const change = d.priceChange24h || 0;
@@ -253,7 +253,7 @@ async function fetchTrending() {
     const data = await resp.json();
     
     const tbody = document.getElementById('trending');
-    const rows = trendingTokens.filter(t => data[t.mint]).map(t => {
+    const rows = trendingTokens.filter(t => data[t.mint] && data[t.mint].usdPrice != null).map(t => {
       const p = data[t.mint];
       const price = p.usdPrice;
       const change = p.priceChange24h || 0;
