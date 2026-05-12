@@ -163,13 +163,13 @@
   </div>
   <div class="content">
     <div class="section">
-      <div class="section-title">SOLANA PRICE TICKER — Jupiter API</div>
+      <div class="section-title">SOLANA PRICE TICKER — Jupiter API v3</div>
       <div class="ticker-grid" id="ticker">
         <div class="loading">Loading live prices...</div>
       </div>
     </div>
     <div class="section">
-      <div class="section-title">TRENDING TOKENS — DexScreener</div>
+      <div class="section-title">TRENDING TOKENS — DexScreener + Jupiter</div>
       <div style="overflow-x: auto;">
         <table>
           <thead>
@@ -177,12 +177,10 @@
               <th>Token</th>
               <th>Price</th>
               <th>24h Change</th>
-              <th>Volume 24h</th>
-              <th>Liquidity</th>
             </tr>
           </thead>
           <tbody id="trending">
-            <tr><td colspan="5" class="loading">Loading trending data...</td></tr>
+            <tr><td colspan="3" class="loading">Loading trending data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -210,8 +208,8 @@ async function fetchPrices() {
     const resp = await fetch(`https://api.jup.ag/price/v3?ids=${ids}`);
     const data = await resp.json();
     const container = document.getElementById('ticker');
-    container.innerHTML = SOL_TOKENS.filter(t => data.data[t.mint]).map(t => {
-      const d = data.data[t.mint];
+    container.innerHTML = SOL_TOKENS.filter(t => data[t.mint]).map(t => {
+      const d = data[t.mint];
       const price = d.usdPrice;
       const change = d.priceChange24h || 0;
       const changeClass = change >= 0 ? 'up' : 'down';
@@ -225,44 +223,55 @@ async function fetchPrices() {
         </div>`;
     }).join('');
   } catch(e) {
-    document.getElementById('ticker').innerHTML = '<div class="error">Failed to load prices</div>';
+    document.getElementById('ticker').innerHTML = '<div class="error">Failed to load prices: ' + e.message + '</div>';
   }
 }
 
 async function fetchTrending() {
   try {
-    const resp = await fetch('https://api.dexscreener.com/token-boosts/top/v1?chainId=solana&limit=15');
-    const tokens = await resp.json();
-    const tbody = document.getElementById('trending');
-    if (!tokens || tokens.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" class="loading">No trending data available</td></tr>';
+    // Step 1: Get trending token addresses from DexScreener boosts
+    const boostResp = await fetch('https://api.dexscreener.com/token-boosts/top/v1?chainId=solana&limit=15');
+    const boosts = await boostResp.json();
+    if (!boosts || boosts.length === 0) {
+      document.getElementById('trending').innerHTML = '<tr><td colspan="3" class="loading">No trending data</td></tr>';
       return;
     }
-    tbody.innerHTML = tokens.slice(0, 15).map(t => {
-      const price = t.priceUsd ? parseFloat(t.priceUsd) : 0;
-      const change = t.priceChange ? t.priceChange.h24 || 0 : 0;
-      const volume = t.volume ? t.volume.h24 || 0 : 0;
-      const liquidity = t.liquidity ? t.liquidity.usd || 0 : 0;
+    
+    const addresses = boosts.map(b => b.tokenAddress).filter(Boolean);
+    const tokenMeta = {};
+    boosts.forEach(b => {
+      if (b.tokenAddress) tokenMeta[b.tokenAddress] = { name: b.name || 'Unknown', symbol: b.symbol || '' };
+    });
+    
+    // Step 2: Batch fetch prices from Jupiter
+    const priceResp = await fetch(`https://api.jup.ag/price/v3?ids=${addresses.join(',')}`);
+    const priceData = await priceResp.json();
+    
+    // Step 3: Combine and display
+    const tbody = document.getElementById('trending');
+    const rows = addresses.filter(a => priceData[a]).map(a => {
+      const p = priceData[a];
+      const meta = tokenMeta[a] || {};
+      const price = p.usdPrice;
+      const change = p.priceChange24h || 0;
       const changeClass = change >= 0 ? 'up' : 'down';
       const sign = change >= 0 ? '+' : '';
       const fmtPrice = price < 0.0001 ? price.toFixed(8) : price < 1 ? price.toFixed(6) : price.toFixed(2);
-      const fmtVol = volume >= 1e6 ? `$${(volume/1e6).toFixed(1)}M` : `$${(volume/1e3).toFixed(0)}K`;
-      const fmtLiq = liquidity >= 1e6 ? `$${(liquidity/1e6).toFixed(1)}M` : `$${(liquidity/1e3).toFixed(0)}K`;
       return `
         <tr>
           <td>
-            <div class="token-name">${t.name || 'Unknown'}</div>
-            <div class="token-symbol">${t.symbol || ''}</div>
+            <div class="token-name">${meta.name || a.slice(0,8)}</div>
+            <div class="token-symbol">${meta.symbol || ''}</div>
           </td>
           <td class="price">$${fmtPrice}</td>
           <td class="change ${changeClass}">${sign}${change.toFixed(2)}%</td>
-          <td class="volume">${fmtVol}</td>
-          <td class="volume">${fmtLiq}</td>
         </tr>`;
-    }).join('');
+    });
+    
+    tbody.innerHTML = rows.length > 0 ? rows.join('') : '<tr><td colspan="3" class="loading">No price data available</td></tr>';
     document.getElementById('refresh').textContent = `Last refresh: ${new Date().toLocaleTimeString()}`;
   } catch(e) {
-    document.getElementById('trending').innerHTML = '<tr><td colspan="5" class="error">Failed to load trending data</td></tr>';
+    document.getElementById('trending').innerHTML = `<tr><td colspan="3" class="error">Failed: ${e.message}</td></tr>`;
   }
 }
 
