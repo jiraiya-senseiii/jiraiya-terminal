@@ -229,29 +229,32 @@ async function fetchPrices() {
 
 async function fetchTrending() {
   try {
-    // Step 1: Get trending token addresses from DexScreener boosts
-    const boostResp = await fetch('https://api.dexscreener.com/token-boosts/top/v1?chainId=solana&limit=15');
-    const boosts = await boostResp.json();
-    if (!boosts || boosts.length === 0) {
-      document.getElementById('trending').innerHTML = '<tr><td colspan="3" class="loading">No trending data</td></tr>';
-      return;
-    }
+    // Curated list of popular Solana tokens
+    const trendingTokens = [
+      { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL' },
+      { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP' },
+      { mint: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263', symbol: 'BONK' },
+      { mint: '7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr', symbol: 'POPCAT' },
+      { mint: '2weMjPLLybRMMva1fM3U31goWWrCpF59CHWNhnCJ9Vyh', symbol: 'WIF' },
+      { mint: 'EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm', symbol: 'WIF2' },
+      { mint: 'MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5', symbol: 'MEW' },
+      { mint: '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU', symbol: 'SAMO' },
+      { mint: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R', symbol: 'RAY' },
+      { mint: 'HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3', symbol: 'PYTH' },
+      { mint: '3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh', symbol: 'WBTC' },
+      { mint: '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs', symbol: 'WETH' },
+      { mint: 'RLBxxFkseAZ4RgJH3Sqn8jXxhmGoz9jWxDNJMh8pL7a', symbol: 'RLB' },
+      { mint: 'TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6', symbol: 'TNSR' },
+      { mint: 'CLoUDKc4Ane7HeQcPpE3YHnznRxhMimJ4MyaU6WVHF2p', symbol: 'CLOUD' },
+    ];
     
-    const addresses = boosts.map(b => b.tokenAddress).filter(Boolean);
-    const tokenMeta = {};
-    boosts.forEach(b => {
-      if (b.tokenAddress) tokenMeta[b.tokenAddress] = { name: b.name || 'Unknown', symbol: b.symbol || '' };
-    });
+    const ids = trendingTokens.map(t => t.mint).join(',');
+    const resp = await fetch(`https://api.jup.ag/price/v3?ids=${ids}`);
+    const data = await resp.json();
     
-    // Step 2: Batch fetch prices from Jupiter
-    const priceResp = await fetch(`https://api.jup.ag/price/v3?ids=${addresses.join(',')}`);
-    const priceData = await priceResp.json();
-    
-    // Step 3: Combine and display
     const tbody = document.getElementById('trending');
-    const rows = addresses.filter(a => priceData[a]).map(a => {
-      const p = priceData[a];
-      const meta = tokenMeta[a] || {};
+    const rows = trendingTokens.filter(t => data[t.mint]).map(t => {
+      const p = data[t.mint];
       const price = p.usdPrice;
       const change = p.priceChange24h || 0;
       const changeClass = change >= 0 ? 'up' : 'down';
@@ -259,10 +262,7 @@ async function fetchTrending() {
       const fmtPrice = price < 0.0001 ? price.toFixed(8) : price < 1 ? price.toFixed(6) : price.toFixed(2);
       return `
         <tr>
-          <td>
-            <div class="token-name">${meta.name || a.slice(0,8)}</div>
-            <div class="token-symbol">${meta.symbol || ''}</div>
-          </td>
+          <td><span class="token-name">${t.symbol}</span></td>
           <td class="price">$${fmtPrice}</td>
           <td class="change ${changeClass}">${sign}${change.toFixed(2)}%</td>
         </tr>`;
