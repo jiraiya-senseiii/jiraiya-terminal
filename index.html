@@ -3,284 +3,234 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jiraiya Terminal — Live Crypto Dashboard</title>
+<title>Jiraiya Terminal v2.0</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #0a0a0a;
-    color: #00ff88;
-    font-family: 'Courier New', monospace;
-    min-height: 100vh;
-    padding: 20px;
-  }
-  .terminal {
-    max-width: 1000px;
-    margin: 0 auto;
-    border: 1px solid #00ff8833;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .header {
-    background: #0d1117;
-    padding: 16px 24px;
-    border-bottom: 1px solid #00ff8833;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .header h1 {
-    font-size: 18px;
-    color: #00ff88;
-    letter-spacing: 2px;
-  }
-  .status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: #00ff8888;
-  }
-  .status-dot {
-    width: 8px; height: 8px;
-    background: #00ff88;
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-  .content { padding: 24px; }
-  .section {
-    margin-bottom: 32px;
-    border: 1px solid #00ff8815;
-    border-radius: 6px;
-    overflow: hidden;
-  }
-  .section-title {
-    background: #0d1117;
-    padding: 12px 16px;
-    font-size: 13px;
-    color: #00ff88;
-    border-bottom: 1px solid #00ff8815;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .section-title::before {
-    content: '>';
-    color: #00ff88;
-  }
-  .ticker-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
-    padding: 16px;
-  }
-  .ticker-card {
-    background: #0d1117;
-    border: 1px solid #00ff8815;
-    border-radius: 6px;
-    padding: 16px;
-    transition: border-color 0.3s;
-  }
-  .ticker-card:hover { border-color: #00ff8844; }
-  .ticker-symbol {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 8px;
-  }
-  .ticker-price {
-    font-size: 22px;
-    font-weight: bold;
-    color: #00ff88;
-    margin-bottom: 4px;
-  }
-  .ticker-change {
-    font-size: 12px;
-  }
-  .ticker-change.up { color: #00ff88; }
-  .ticker-change.down { color: #ff4444; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  th {
-    text-align: left;
-    padding: 12px 16px;
-    font-size: 11px;
-    color: #00ff8888;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-bottom: 1px solid #00ff8815;
-    background: #0d1117;
-  }
-  td {
-    padding: 12px 16px;
-    font-size: 13px;
-    border-bottom: 1px solid #00ff8808;
-  }
-  tr:hover td { background: #00ff8805; }
-  .token-name {
-    color: #fff;
-    font-weight: bold;
-  }
-  .token-symbol { color: #00ff8888; font-size: 11px; }
-  .price { color: #00ff88; font-weight: bold; }
-  .change.up { color: #00ff88; }
-  .change.down { color: #ff4444; }
-  .volume { color: #888; font-size: 12px; }
-  .footer {
-    padding: 16px 24px;
-    border-top: 1px solid #00ff8815;
-    font-size: 11px;
-    color: #00ff8844;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .loading { text-align: center; padding: 40px; color: #00ff8844; }
-  .error { color: #ff4444; padding: 16px; font-size: 12px; }
-  .refresh-time { color: #00ff8844; }
-  @media (max-width: 600px) {
-    body { padding: 10px; }
-    .content { padding: 12px; }
-    .ticker-grid { grid-template-columns: repeat(2, 1fr); }
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#00ff88;font-family:'Courier New',monospace;min-height:100vh;padding:16px}
+.terminal{max-width:1100px;margin:0 auto;border:1px solid #00ff8833;border-radius:8px;overflow:hidden}
+.header{background:#0d1117;padding:14px 20px;border-bottom:1px solid #00ff8833;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.header h1{font-size:17px;color:#00ff88;letter-spacing:1px}
+.status{display:flex;align-items:center;gap:8px;font-size:11px;color:#00ff8888}
+.dot{width:7px;height:7px;background:#00ff88;border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.content{padding:20px}
+.section{margin-bottom:24px;border:1px solid #00ff8815;border-radius:6px;overflow:hidden}
+.stitle{background:#0d1117;padding:10px 16px;font-size:12px;color:#00ff88;border-bottom:1px solid #00ff8815}
+.stitle::before{content:'> ';color:#00ff88}
+.bar{padding:12px 16px;display:flex;gap:10px}
+.bar input{flex:1;background:#0d1117;border:1px solid #00ff8820;color:#fff;padding:8px 14px;font-family:monospace;font-size:13px;border-radius:4px;outline:none}
+.bar input:focus{border-color:#00ff8860}
+.bar button{background:#00ff8815;border:1px solid #00ff8830;color:#00ff88;padding:8px 16px;font-family:monospace;cursor:pointer;border-radius:4px;font-size:12px}
+.bar button:hover{background:#00ff8825}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;padding:14px}
+.card{background:#0d1117;border:1px solid #00ff8815;border-radius:6px;padding:14px;transition:border-color .2s;position:relative}
+.card:hover{border-color:#00ff8840}
+.card-img{width:36px;height:36px;border-radius:50%;margin-bottom:8px;background:#111;float:right}
+.card-sym{font-size:14px;color:#fff;font-weight:bold}
+.card-price{font-size:20px;font-weight:bold;color:#00ff88;margin:4px 0}
+.card-change{font-size:11px}
+.card-meta{font-size:10px;color:#888;margin-top:6px;line-height:1.5}
+.up{color:#00ff88}.down{color:#ff4444}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 14px;font-size:10px;color:#00ff8888;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #00ff8815;background:#0d1117;cursor:pointer}
+th:hover{color:#00ff88}
+td{padding:10px 14px;font-size:12px;border-bottom:1px solid #00ff8808}
+tr:hover td{background:#00ff8805}
+.tok-img{width:20px;height:20px;border-radius:50%;vertical-align:middle;margin-right:6px}
+.tok-name{color:#fff;font-weight:bold}
+.price{color:#00ff88;font-weight:bold}
+.vol{color:#888;font-size:11px}
+.footer{padding:14px 20px;border-top:1px solid #00ff8815;font-size:10px;color:#00ff8844;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.loading{text-align:center;padding:30px;color:#00ff8844}
+.error{color:#ff4444;padding:12px;font-size:11px}
+@media(max-width:600px){body{padding:8px}.content{padding:10px}.grid{grid-template-columns:repeat(2,1fr)}.card-meta{display:none}}
 </style>
 </head>
 <body>
 <div class="terminal">
-  <div class="header">
-    <h1>⚡ JIRAIYA TERMINAL v1.0</h1>
-    <div class="status">
-      <span class="status-dot"></span>
-      <span>LIVE — Powered by Hermes Agent</span>
-    </div>
-  </div>
-  <div class="content">
-    <div class="section">
-      <div class="section-title">SOLANA PRICE TICKER — Jupiter API v3</div>
-      <div class="ticker-grid" id="ticker">
-        <div class="loading">Loading live prices...</div>
-      </div>
-    </div>
-    <div class="section">
-      <div class="section-title">TRENDING TOKENS — DexScreener + Jupiter</div>
-      <div style="overflow-x: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Token</th>
-              <th>Price</th>
-              <th>24h Change</th>
-            </tr>
-          </thead>
-          <tbody id="trending">
-            <tr><td colspan="3" class="loading">Loading trending data...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-  <div class="footer">
-    <span>Built autonomously by Jiraiya (Hermes Agent) · DeepSeek v4-pro</span>
-    <span class="refresh-time" id="refresh">Last refresh: ...</span>
-  </div>
+<div class="header">
+<h1>⚡ JIRAIYA TERMINAL v2.0</h1>
+<div class="status"><span class="dot"></span><span>LIVE — Jupiter + DexScreener</span></div>
+</div>
+<div class="content">
+
+<div class="section">
+<div class="stitle">SEARCH — Add any Solana token</div>
+<div class="bar">
+<input id="search" placeholder="Paste mint address or token symbol..." onkeydown="if(event.key==='Enter')addToken()">
+<button onclick="addToken()">ADD TOKEN</button>
+<button onclick="clearAdded()" style="background:#ff444415;border-color:#ff444430;color:#ff4444">CLEAR</button>
+</div>
+</div>
+
+<div class="section">
+<div class="stitle">PRICE TICKER</div>
+<div class="grid" id="ticker"><div class="loading">Loading...</div></div>
+</div>
+
+<div class="section">
+<div class="stitle">ALL TOKENS — Click headers to sort</div>
+<div style="overflow-x:auto">
+<table>
+<thead>
+<tr>
+<th onclick="sortTable('symbol')">Token</th>
+<th onclick="sortTable('price')">Price</th>
+<th onclick="sortTable('change')">24h Δ</th>
+<th onclick="sortTable('volume')">Volume 24h</th>
+<th onclick="sortTable('liquidity')">Liquidity</th>
+</tr>
+</thead>
+<tbody id="table"><tr><td colspan="5" class="loading">Loading...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+<div class="footer">
+<span>Jiraiya v2.0 — Jupiter v3 + DexScreener fallback — Built by Hermes Agent</span>
+<span id="refresh">…</span>
+</div>
 </div>
 
 <script>
-const SOL_TOKENS = [
-  { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL' },
-  { mint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', symbol: 'USDC' },
-  { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP' },
-  { mint: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263', symbol: 'BONK' },
-  { mint: '7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr', symbol: 'POPCAT' },
-  { mint: 'MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5', symbol: 'MEW' },
+const DEFAULT_TOKENS=[
+{mint:'So11111111111111111111111111111111111111112',sym:'SOL'},
+{mint:'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',sym:'USDC'},
+{mint:'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN',sym:'JUP'},
+{mint:'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263',sym:'BONK'},
+{mint:'7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr',sym:'POPCAT'},
+{mint:'MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5',sym:'MEW'},
+{mint:'EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm',sym:'WIF'},
+{mint:'7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU',sym:'SAMO'},
+{mint:'4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',sym:'RAY'},
+{mint:'jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL',sym:'JTO'},
+{mint:'HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3',sym:'PYTH'},
+{mint:'3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh',sym:'WBTC'},
 ];
+let userTokens=[], tokenCache={}, sortCol='price', sortDir=-1;
 
-async function fetchPrices() {
-  try {
-    const ids = SOL_TOKENS.map(t => t.mint).join(',');
-    const resp = await fetch(`https://api.jup.ag/price/v3?ids=${ids}`);
-    const data = await resp.json();
-    const container = document.getElementById('ticker');
-    container.innerHTML = SOL_TOKENS.filter(t => data[t.mint] && data[t.mint].usdPrice != null).map(t => {
-      const d = data[t.mint];
-      const price = d.usdPrice;
-      const change = d.priceChange24h || 0;
-      const changeClass = change >= 0 ? 'up' : 'down';
-      const sign = change >= 0 ? '+' : '';
-      const fmtPrice = price < 0.01 ? price.toFixed(6) : price < 1 ? price.toFixed(4) : price.toFixed(2);
-      return `
-        <div class="ticker-card">
-          <div class="ticker-symbol">${t.symbol}</div>
-          <div class="ticker-price">$${fmtPrice}</div>
-          <div class="ticker-change ${changeClass}">${sign}${change.toFixed(2)}%</div>
-        </div>`;
-    }).join('');
-  } catch(e) {
-    document.getElementById('ticker').innerHTML = '<div class="error">Failed to load prices: ' + e.message + '</div>';
-  }
+function allTokens(){return[...DEFAULT_TOKENS,...userTokens]}
+
+async function fetchMeta(mint){
+if(tokenCache[mint])return tokenCache[mint];
+try{
+const r=await fetch(`https://api.dexscreener.com/token-pairs/v1/solana/${mint}`);
+const d=await r.json();
+if(d&&d[0]){
+const p=d[0];
+const meta={
+img:p.info?.imageUrl||'',name:p.baseToken?.name||'',
+vol:p.volume?.h24||0,liq:p.liquidity?.usd||0,fdv:p.fdv||0,
+dex:p.dexId||'',url:p.url||''
+};
+tokenCache[mint]=meta;return meta;
+}
+}catch(e){}
+return{};
 }
 
-async function fetchTrending() {
-  try {
-    // Curated list of popular Solana tokens
-    const trendingTokens = [
-      { mint: 'So11111111111111111111111111111111111111112', symbol: 'SOL' },
-      { mint: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP' },
-      { mint: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263', symbol: 'BONK' },
-      { mint: '7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr', symbol: 'POPCAT' },
-      { mint: 'jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL', symbol: 'JTO' },
-      { mint: 'EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm', symbol: 'WIF2' },
-      { mint: 'MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5', symbol: 'MEW' },
-      { mint: '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU', symbol: 'SAMO' },
-      { mint: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R', symbol: 'RAY' },
-      { mint: 'HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3', symbol: 'PYTH' },
-      { mint: '3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh', symbol: 'WBTC' },
-      { mint: '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs', symbol: 'WETH' },
-      { mint: 'RLBxxFkseAZ4RgJH3Sqn8jXxhmGoz9jWxDNJMh8pL7a', symbol: 'RLB' },
-      { mint: 'TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6', symbol: 'TNSR' },
-      { mint: 'CLoUDKc4Ane7HeQcPpE3YHnznRxhMimJ4MyaU6WVHF2p', symbol: 'CLOUD' },
-    ];
-    
-    const ids = trendingTokens.map(t => t.mint).join(',');
-    const resp = await fetch(`https://api.jup.ag/price/v3?ids=${ids}`);
-    const data = await resp.json();
-    
-    const tbody = document.getElementById('trending');
-    const rows = trendingTokens.filter(t => data[t.mint] && data[t.mint].usdPrice != null).map(t => {
-      const p = data[t.mint];
-      const price = p.usdPrice;
-      const change = p.priceChange24h || 0;
-      const changeClass = change >= 0 ? 'up' : 'down';
-      const sign = change >= 0 ? '+' : '';
-      const fmtPrice = price < 0.0001 ? price.toFixed(8) : price < 1 ? price.toFixed(6) : price.toFixed(2);
-      return `
-        <tr>
-          <td><span class="token-name">${t.symbol}</span></td>
-          <td class="price">$${fmtPrice}</td>
-          <td class="change ${changeClass}">${sign}${change.toFixed(2)}%</td>
-        </tr>`;
-    });
-    
-    tbody.innerHTML = rows.length > 0 ? rows.join('') : '<tr><td colspan="3" class="loading">No price data available</td></tr>';
-    document.getElementById('refresh').textContent = `Last refresh: ${new Date().toLocaleTimeString()}`;
-  } catch(e) {
-    document.getElementById('trending').innerHTML = `<tr><td colspan="3" class="error">Failed: ${e.message}</td></tr>`;
-  }
+async function fetchPriceWithFallback(mint){
+try{
+const r=await fetch(`https://api.jup.ag/price/v3?ids=${mint}`);
+const d=await r.json();
+if(d[mint]&&d[mint].usdPrice!=null)return{price:d[mint].usdPrice,change:d[mint].priceChange24h||0,liq:d[mint].liquidity||0};
+}catch(e){}
+try{
+const r=await fetch(`https://api.dexscreener.com/latest/dex/search?q=${mint}`);
+const d=await r.json();
+const p=d.pairs?.[0];
+if(p?.priceUsd)return{price:parseFloat(p.priceUsd),change:p.priceChange?.h24||0,vol:p.volume?.h24||0,liq:p.liquidity?.usd||0};
+}catch(e){}
+return null;
 }
 
-async function refresh() {
-  await Promise.all([fetchPrices(), fetchTrending()]);
+function fmtPrice(p){if(p==null)return'N/A';return p<0.0001?p.toFixed(8):p<1?p.toFixed(6):p.toFixed(2)}
+function fmtVol(v){if(!v)return'';return v>=1e6?'$'+(v/1e6).toFixed(1)+'M':'$'+(v/1e3).toFixed(0)+'K'}
+
+async function refresh(){
+const tokens=allTokens();
+const mints=tokens.map(t=>t.mint);
+const data={};
+// Jupiter batch
+try{
+const r=await fetch(`https://api.jup.ag/price/v3?ids=${mints.join(',')}`);
+const d=await r.json();
+for(const t of tokens){
+if(d[t.mint]&&d[t.mint].usdPrice!=null)data[t.mint]={price:d[t.mint].usdPrice,change:d[t.mint].priceChange24h||0};
 }
+}catch(e){}
+// DexScreener fallback for nulls
+for(const t of tokens){
+if(!data[t.mint]){
+const fb=await fetchPriceWithFallback(t.mint);
+if(fb)data[t.mint]=fb;
+}
+}
+// Fetch metadata
+const metas={};
+await Promise.all(tokens.map(async t=>{metas[t.mint]=await fetchMeta(t.mint)}));
+// Render ticker (first 8)
+const tickerEl=document.getElementById('ticker');
+tickerEl.innerHTML=tokens.slice(0,8).filter(t=>data[t.mint]).map(t=>{
+const d=data[t.mint],m=metas[t.mint]||{};
+const ch=d.change||0,cls=ch>=0?'up':'down',sign=ch>=0?'+':'';
+return`<div class="card">
+${m.img?`<img class="card-img" src="${m.img}" onerror="this.remove()">`:''}
+<div class="card-sym">${t.sym}</div>
+<div class="card-price">$${fmtPrice(d.price)}</div>
+<div class="card-change ${cls}">${sign}${ch.toFixed(2)}%</div>
+<div class="card-meta">Vol: ${fmtVol(m.vol)} | Liq: ${fmtVol(m.liq)}</div>
+</div>`;
+}).join('');
+// Render table (all, sorted)
+let rows=tokens.filter(t=>data[t.mint]).map(t=>({...t,...data[t.mint],...metas[t.mint]||{}}));
+rows.sort((a,b)=>{
+let va=a[sortCol]||0,vb=b[sortCol]||0;
+if(typeof va==='string')va=va.toLowerCase(),vb=(vb||'').toLowerCase();
+return (va>vb?1:va<vb?-1:0)*sortDir;
+});
+document.getElementById('table').innerHTML=rows.map(t=>{
+const ch=t.change||0,cls=ch>=0?'up':'down',sign=ch>=0?'+':'';
+return`<tr>
+<td>${t.img?`<img class="tok-img" src="${t.img}" onerror="this.remove()">`:''}<span class="tok-name">${t.sym}</span></td>
+<td class="price">$${fmtPrice(t.price)}</td>
+<td class="${cls}">${sign}${ch.toFixed(2)}%</td>
+<td class="vol">${fmtVol(t.vol)}</td>
+<td class="vol">${fmtVol(t.liq)}</td>
+</tr>`;
+}).join('');
+document.getElementById('refresh').textContent='Last refresh: '+new Date().toLocaleTimeString();
+}
+
+function sortTable(col){
+if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=-1}
+refresh();
+}
+
+async function addToken(){
+const q=document.getElementById('search').value.trim();
+if(!q)return;
+try{
+let mint=q;
+if(q.length<30){
+const r=await fetch(`https://api.dexscreener.com/latest/dex/search?q=${q}`);
+const d=await r.json();
+const pair=d.pairs?.find(p=>p.chainId==='solana');
+if(pair)mint=pair.pairAddress;
+}
+if(mint&&!allTokens().find(t=>t.mint===mint)){
+userTokens.push({mint,sym:q.length<30?q.toUpperCase():mint.slice(0,8)});
+document.getElementById('search').value='';
+refresh();
+}
+}catch(e){}
+}
+function clearAdded(){userTokens=[];refresh()}
 
 refresh();
-setInterval(refresh, 30000);
+setInterval(refresh,30000);
 </script>
 </body>
 </html>
